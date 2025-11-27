@@ -8,158 +8,114 @@
 </head>
 <body>
     <script>
-        // ⭐ 과제 4: 캐리커처 (좌표 수정 완료)
-        let centerX = 175;
-        let centerY = 160;
+let colorEvening;
+let colorNight;
+let stars = []; // Array for stars
 
-        const PALETTE = {
-            skin: '#F7D4B6', hair: '#5C3A21', lips: '#E54F6D', white: '#FFFFFF', black: '#000000',
-            blush: 'rgba(229, 79, 109, 0.2)', hat: '#C75D5D', hatBand: '#D4AC87',
-            sky: '#87CEEB', cloud: '#FFFFFF', sea: '#66DDAA', field: '#FFDD00', ground: '#90EE90',
-        };
+function setup() {
+  createCanvas(600, 400);
 
-        function setup() {
-            createCanvas(350, 350);
-            angleMode(DEGREES);
-        }
+  // Set frame rate for GIF size
+  frameRate(24);
 
-        function draw() {
-            // 캐릭터가 화면 밖으로 나가지 않도록 제한
-            centerX = constrain(centerX, 50, 300);
-            centerY = constrain(centerY, 100, 250);
+  colorEvening = color(180, 190, 230);
+  colorNight = color(10, 20, 50);
 
-            if (keyIsDown(LEFT_ARROW)) centerX -= 3;
-            if (keyIsDown(RIGHT_ARROW)) centerX += 3;
-            if (keyIsDown(UP_ARROW)) centerY -= 3;
-            if (keyIsDown(DOWN_ARROW)) centerY += 3;
+  // Create 150 stars in random positions
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: random(width),
+      y: random(height * 0.7) // Only in the upper 70% of sky
+    });
+  }
+}
 
-            drawBackground();
-            drawHair_Back();
-            drawShoulder();
-            drawHat_Back();
-            drawFace();
-            drawHat_Top();
-            drawEyes();
-            drawNose();
-            drawMouth();
-            drawHat_Front();
-        }
+function draw() {
+  // --- MODIFICATION 1: Looping Day/Night Cycle ---
+  // Use cos() for a smooth 0 -> 1 -> 0 loop
+  let transitionFrames = 120; // 5 seconds for day->night (or night->day)
+  let angle = frameCount * (PI / transitionFrames);
+  let cosValue = cos(angle);
+  
+  // Map cos() (which goes 1 -> -1 -> 1) to a progress value (0 -> 1 -> 0)
+  let progress = map(cosValue, 1, -1, 0, 1);
 
-        function drawBackground() {
-            noStroke();
-            fill(PALETTE.sky);
-            rect(0, 0, width, height / 2 + 50);
-            fill(PALETTE.cloud);
-            ellipse(100, 80, 100, 60);
-            ellipse(150, 70, 120, 70);
-            ellipse(300, 100, 150, 80); 
-            ellipse(280, 90, 110, 60);  
-            fill(PALETTE.sea);
-            rect(0, height / 2 + 50, width, height / 4);
-            fill(PALETTE.field);
-            rect(0, height * 3 / 4 + 50, width, height / 4 - 50);
-            fill(PALETTE.ground);
-            rect(0, height * 3 / 4, width, 50);
-        }
+  // Sky color transition
+  let skyColor = lerpColor(colorEvening, colorNight, progress);
+  background(skyColor);
 
-        function drawFace() {
-            noStroke();
-            fill(PALETTE.skin);
-            rect(centerX - 25, centerY - 20, 50, 80);
-            ellipse(centerX, centerY, 180, 220);
-            let blushOpacity = mouseIsPressed ? 0.7 : 0.2;
-            fill('rgba(229, 79, 109, ' + blushOpacity + ')');
-            ellipse(centerX - 50, centerY + 40, 50, 30);
-            ellipse(centerX + 50, centerY + 40, 50, 30);
-        }
+  // Draw stars
+  // Stars fade in as progress -> 1 (night)
+  let starAlpha = map(progress, 0.3, 1, 0, 255); 
+  stroke(255, 255, 200, starAlpha);
 
-        function drawEyes() {
-            const eyeY = centerY + 10;
-            let pOffsetX = map(mouseX, 0, width, -5, 5);
-            let pOffsetY = map(mouseY, 0, height, -3, 3);
-            pOffsetX = constrain(pOffsetX, -5, 5);
-            pOffsetY = constrain(pOffsetY, -3, 3);
+  for (let s of stars) {
+    // --- MODIFICATION 2: Faster Twinkle ---
+    // Increased frequency from 0.2 to 0.4
+    let starSize = map(sin(frameCount * 0.4 + s.x), -1, 1, 1, 3);
+    strokeWeight(starSize);
+    point(s.x, s.y);
+  }
 
-            // 왼쪽 눈
-            const eyeLX = centerX - 40;
-            fill(PALETTE.white); stroke(PALETTE.black); strokeWeight(2);
-            arc(eyeLX, eyeY, 50, 35, 180, 360, CHORD);
-            fill(PALETTE.black); noStroke();
-            ellipse(eyeLX + pOffsetX, eyeY + 4 + pOffsetY, 18, 18);
-            fill(PALETTE.white); ellipse(eyeLX - 3, eyeY + 1, 5, 5);
-            noFill(); stroke(PALETTE.hair); strokeWeight(4);
-            arc(eyeLX, eyeY - 25, 40, 20, 180, 360);
+  // Sun and Moon movement
+  noStroke();
 
-            // 오른쪽 눈
-            const eyeRX = centerX + 40;
-            fill(PALETTE.white); stroke(PALETTE.black); strokeWeight(2);
-            arc(eyeRX, eyeY, 50, 35, 180, 360, CHORD);
-            fill(PALETTE.black); noStroke();
-            ellipse(eyeRX + pOffsetX, eyeY + 4 + pOffsetY, 18, 18);
-            fill(PALETTE.white); ellipse(eyeRX + 3, eyeY + 1, 5, 5);
-            noFill(); stroke(PALETTE.hair); strokeWeight(4);
-            arc(eyeRX, eyeY - 25, 40, 20, 180, 360);
-        }
+  // Sun: When progress 0->1 (sets), when 1->0 (rises)
+  fill(255, 240, 180);
+  let sunY = map(progress, 0, 1, 180, 350);
+  ellipse(150, sunY, 120, 120);
 
-        function drawNose() {
-            stroke(PALETTE.black); strokeWeight(1.5);
-            const noseY = centerY + 30;
-            line(centerX, noseY, centerX - 5, noseY + 20);
-            line(centerX - 5, noseY + 20, centerX + 5, noseY + 20);
-        }
+  // Moon: When progress 0->1 (rises), when 1->0 (sets)
+  // Moon alpha fades in during the first half of night
+  let moonAlpha = map(progress, 0.2, 0.7, 0, 255); 
+  fill(255, 255, 220, moonAlpha);
+  let moonY = map(progress, 0, 1, 350, 150);
 
-        function drawMouth() {
-            const mouthY = centerY + 70;
-            fill(PALETTE.lips); noStroke();
-            arc(centerX - 15, mouthY, 30, 20, 180, 360);
-            arc(centerX + 15, mouthY, 30, 20, 180, 360);
-            if (keyIsDown(84)) { // 'T' key
-                fill(PALETTE.black);
-                arc(centerX, mouthY + 5, 50, 40, 0, 180, CHORD);
-            } else {
-                stroke(PALETTE.black); strokeWeight(2);
-                arc(centerX, mouthY + 2, 60, 40, 0, 180, CHORD);
-                fill(PALETTE.white); noStroke();
-                arc(centerX, mouthY + 2, 56, 25, 0, 180);
-            }
-        }
+  // Draw crescent moon
+  ellipse(450, moonY, 80, 80); 
+  fill(skyColor); // Use sky color to cover part of it
+  noStroke();
+  ellipse(430, moonY - 5, 80, 80); // Draw shadow
 
-        function drawHair_Back() {
-            fill(PALETTE.hair); noStroke();
-            let hairStartY = centerY - 100;
-            rect(centerX - 120, hairStartY, 110, 350, 0, 0, 20, 20);
-            rect(centerX + 10, hairStartY, 110, 350, 0, 0, 20, 20);
-        }
+  // Draw original hills
+  noStroke();
+  fill(150, 160, 200);
+  triangle(0, 280, 300, 150, 600, 350);
+  fill(120, 130, 180);
+  triangle(0, 400, 200, 200, 700, 400);
+  fill(90, 100, 150);
+  triangle(-50, 400, 450, 250, 600, 400);
 
-        function drawHat_Top() {
-            const hatY = centerY - 120;
-            noStroke(); fill(PALETTE.hat); ellipse(centerX, hatY, 170, 140);
-            fill(PALETTE.hatBand); rect(centerX - 95, hatY, 190, 25, 10);
-        }
+  // Draw original trees
+  let sway = sin(frameCount * 0.1) * 2;
 
-        function drawHat_Back() {
-            const hatY = centerY - 110;
-            noStroke(); fill(PALETTE.hat); arc(centerX, hatY, 350, 180, 150, 390);
-        }
+  // Left tree
+  fill(80, 60, 40);
+  rect(180, 180, 10, 40);
+  fill(80, 130, 100);
+  stroke(255);
+  strokeWeight(3);
+  ellipse(185 + sway, 175, 40, 40); // Apply sway
 
-        function drawHat_Front() {
-            const hatY = centerY - 100;
-            noStroke(); fill(PALETTE.hat); arc(centerX, hatY, 350, 150, 0, 180);
-        }
+  // Right tree
+  noStroke();
+  fill(80, 60, 40);
+  rect(430, 250, 15, 60);
+  fill(70, 110, 90);
+  ellipse(438 + sway, 240, 70, 70); // Apply sway
+}
 
-        function drawShoulder() {
-            const shoulderY = centerY + 180;
-            const shoulderSize = 210;
-            const shoulderOffset = 130;
-            fill(PALETTE.white); stroke('#DDDDDD'); strokeWeight(3);
-            arc(centerX - shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
-            arc(centerX + shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
-            noStroke(); rect(centerX - shoulderOffset, shoulderY - 90, shoulderOffset * 2, 110);
-        }
+// Save functions
+function keyPressed() {
+  if (key === 's' || key === 'S') {
+    saveCanvas('night_landscape_static', 'png');
+  }
 
-        function keyPressed() {
-            if (key === 's' || key === 'S') saveGif('myCaricature.gif', 5);
-        }
+  if (key === 'g' || key === 'G') {
+    // Save a 10-second GIF
+    saveGif('myAnimatedNightScene', 10);
+  }
+}
     </script>
 </body>
 </html>
