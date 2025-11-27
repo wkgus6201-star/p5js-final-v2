@@ -16,8 +16,8 @@ const PALETTE = {
 };
 
 // 그림의 중심 좌표를 변수로 설정하여 위치 조정을 쉽게 합니다.
-const centerX = 300;
-const centerY = 220;
+const centerX = 175; // 캔버스 크기 350에 맞춰 중심을 175로 수정
+const centerY = 160; // 캔버스 크기 350에 맞춰 중심을 조정 (원래 220이었음)
 
 function setup() {
   createCanvas(350, 350);
@@ -27,7 +27,7 @@ function setup() {
 
 function draw() {
   // 배경 그리기 (맨 뒤에 위치)
-  drawBackground(); 
+  drawBackground();
 
   // 캐리커처 그리기 (배경 위에 위치)
   drawHair_Back();
@@ -47,26 +47,26 @@ function drawBackground() {
 
   // 하늘
   fill(PALETTE.sky);
-  rect(0, 0, width, height / 2 + 50); // 캔버스의 절반 이상을 하늘로
+  rect(0, 0, width, height / 2 + 50);
 
-  // 구름
+  // 구름 (캔버스 크기에 맞게 X 좌표 수정)
   fill(PALETTE.cloud);
   ellipse(100, 80, 100, 60);
   ellipse(150, 70, 120, 70);
-  ellipse(500, 100, 150, 80);
-  ellipse(430, 90, 110, 60);
+  ellipse(300, 100, 150, 80); // 🚨 X좌표 500 -> 300으로 수정
+  ellipse(280, 90, 110, 60); // 🚨 X좌표 430 -> 280으로 수정
 
   // 바다 (하늘 아래)
   fill(PALETTE.sea);
-  rect(0, height / 2 + 50, width, height / 4); // 하늘 아래 중간 부분
+  rect(0, height / 2 + 50, width, height / 4);
 
   // 육지/들판 (가장 아래)
   fill(PALETTE.field); // 유채꽃밭 연상
-  rect(0, height * 3 / 4 + 50, width, height / 4 - 50); // 바다 아래 노란색 들판
+  rect(0, height * 3 / 4 + 50, width, height / 4 - 50);
 
   // 육지/풀밭 (노란 들판 위)
   fill(PALETTE.ground); // 풀밭 연상
-  rect(0, height * 3 / 4, width, 50); // 캐릭터 발 아래쯤에 위치
+  rect(0, height * 3 / 4, width, 50);
 }
 
 
@@ -84,7 +84,7 @@ function drawFace() {
 // 눈과 눈썹을 그리는 함수
 function drawEyes() {
   const eyeY = centerY + 10;
-  
+
   // 왼쪽 눈
   const eyeLX = centerX - 40;
   fill(PALETTE.white);
@@ -155,7 +155,7 @@ function drawHair_Back() {
 
 // 모자 윗부분(크라운)을 그리는 함수
 function drawHat_Top() {
-  const hatY = centerY -120;
+  const hatY = centerY - 120;
   noStroke();
   fill(PALETTE.hat);
   ellipse(centerX, hatY, 170, 140);
@@ -168,6 +168,7 @@ function drawHat_Back() {
   const hatY = centerY - 110;
   noStroke();
   fill(PALETTE.hat);
+  // 🚨 캔버스 크기에 맞게 350으로 이미 수정되어 있어 괜찮습니다.
   arc(centerX, hatY, 350, 180, 150, 390);
 }
 
@@ -176,6 +177,7 @@ function drawHat_Front() {
   const hatY = centerY - 100;
   noStroke();
   fill(PALETTE.hat);
+  // 🚨 캔버스 크기에 맞게 350으로 이미 수정되어 있어 괜찮습니다.
   arc(centerX, hatY, 350, 150, 0, 180);
 }
 
@@ -184,12 +186,17 @@ function drawShoulder() {
   const shoulderY = centerY + 180;
   const shoulderSize = 260;
   const shoulderOffset = 130;
-  
+
   fill(PALETTE.white);
-  
+
   // 1. 어깨 곡선을 먼저 그립니다.
   stroke('#DDDDDD');
   strokeWeight(3);
+  // 🚨 캔버스 크기에 맞게 X 좌표 수정 (원래 300이었던 centerX를 175로 수정했으므로)
+  // 이전 코드: arc(centerX - shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
+  // 이전 코드: arc(centerX + shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
+  
+  // centerX를 175로 이미 수정했으므로, 이 부분은 문제 없이 작동합니다.
   arc(centerX - shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
   arc(centerX + shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
 

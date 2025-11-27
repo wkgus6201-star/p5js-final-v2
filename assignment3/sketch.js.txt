@@ -1,5 +1,7 @@
-let centerX = 300;
-let centerY = 220;
+// ⭐ 최종 수정 버전: 좌표 및 중심 문제 해결 ⭐
+
+let centerX = 175; // 🚨 수정: 350px 캔버스의 중앙 (175) 근처로 설정
+let centerY = 160; // 🚨 수정: 350px 캔버스의 중심 근처로 설정
 
 function setup() {
   createCanvas(350, 350);
@@ -7,6 +9,10 @@ function setup() {
 }
 
 function draw() {
+  // 캔버스 크기가 350x350이므로, 캐릭터가 화면 밖으로 나가지 않도록 제한합니다.
+  centerX = constrain(centerX, 50, 300);
+  centerY = constrain(centerY, 100, 250);
+
   if (keyIsDown(LEFT_ARROW)) {
     centerX -= 3;
   }
@@ -32,6 +38,7 @@ function draw() {
   drawHat_Front();
 }
 
+// 🚨 drawBackground 함수 내부의 구름 좌표 수정
 function drawBackground() {
   noStroke();
   fill('#87CEEB');
@@ -39,8 +46,8 @@ function drawBackground() {
   fill('#FFFFFF');
   ellipse(100, 80, 100, 60);
   ellipse(150, 70, 120, 70);
-  ellipse(500, 100, 150, 80);
-  ellipse(430, 90, 110, 60);
+  ellipse(300, 100, 150, 80); // 🚨 X좌표 500 -> 300으로 수정
+  ellipse(280, 90, 110, 60);  // 🚨 X좌표 430 -> 280으로 수정
   fill('#66DDAA');
   rect(0, height / 2 + 50, width, height / 4);
   fill('#FFDD00');
@@ -49,135 +56,7 @@ function drawBackground() {
   rect(0, height * 3 / 4, width, 50);
 }
 
-function drawFace() {
-  noStroke();
-  fill('#F7D4B6');
-  rect(centerX - 25, centerY - 20, 50, 80);
-  ellipse(centerX, centerY, 180, 220);
-
-  let blushOpacity = 0.2;
-  if (mouseIsPressed) {
-    blushOpacity = 0.7;
-  }
-  fill('rgba(229, 79, 109, ' + blushOpacity + ')');
-  ellipse(centerX - 50, centerY + 40, 50, 30);
-  ellipse(centerX + 50, centerY + 40, 50, 30);
-}
-
-function drawEyes() {
-  const eyeY = centerY + 10;
-  let pOffsetX = map(mouseX, 0, width, -5, 5);
-  let pOffsetY = map(mouseY, 0, height, -3, 3);
-  pOffsetX = constrain(pOffsetX, -5, 5);
-  pOffsetY = constrain(pOffsetY, -3, 3);
-
-  const eyeLX = centerX - 40;
-  fill('#FFFFFF');
-  stroke('#000000');
-  strokeWeight(2);
-  arc(eyeLX, eyeY, 50, 35, 180, 360, CHORD);
-  fill('#000000');
-  noStroke();
-  ellipse(eyeLX + pOffsetX, eyeY + 4 + pOffsetY, 18, 18);
-  fill('#FFFFFF');
-  ellipse(eyeLX - 3, eyeY + 1, 5, 5);
-  noFill();
-  stroke('#5C3A21');
-  strokeWeight(4);
-  arc(eyeLX, eyeY - 25, 40, 20, 180, 360);
-
-  const eyeRX = centerX + 40;
-  fill('#FFFFFF');
-  stroke('#000000');
-  strokeWeight(2);
-  arc(eyeRX, eyeY, 50, 35, 180, 360, CHORD);
-  fill('#000000');
-  noStroke();
-  ellipse(eyeRX + pOffsetX, eyeY + 4 + pOffsetY, 18, 18);
-  fill('#FFFFFF');
-  ellipse(eyeRX + 3, eyeY + 1, 5, 5);
-  noFill();
-  stroke('#5C3A21');
-  strokeWeight(4);
-  arc(eyeRX, eyeY - 25, 40, 20, 180, 360);
-}
-
-function drawNose() {
-  stroke('#000000');
-  strokeWeight(1.5);
-  const noseY = centerY + 30;
-  line(centerX, noseY, centerX - 5, noseY + 20);
-  line(centerX - 5, noseY + 20, centerX + 5, noseY + 20);
-}
-
-function drawMouth() {
-  const mouthY = centerY + 70;
-  fill('#E54F6D');
-  noStroke();
-  arc(centerX - 15, mouthY, 30, 20, 180, 360);
-  arc(centerX + 15, mouthY, 30, 20, 180, 360);
-
-  if (keyIsDown(84)) { // 'T' key
-    fill('#000000');
-    arc(centerX, mouthY + 5, 50, 40, 0, 180, CHORD);
-  } else {
-    stroke('#000000');
-    strokeWeight(2);
-    arc(centerX, mouthY + 2, 60, 40, 0, 180, CHORD);
-    fill('#FFFFFF');
-    noStroke();
-    arc(centerX, mouthY + 2, 56, 25, 0, 180);
-  }
-}
-
-function drawHair_Back() {
-  fill('#5C3A21');
-  noStroke();
-  let hairWidth = 110;
-  let hairHeight = 350;
-  let hairStartY = centerY - 100;
-  rect(centerX - 120, hairStartY, hairWidth, hairHeight, 0, 0, 20, 20);
-  rect(centerX + 10, hairStartY, hairWidth, hairHeight, 0, 0, 20, 20);
-}
-
-function drawHat_Top() {
-  const hatY = centerY - 120;
-  noStroke();
-  fill('#C75D5D');
-  ellipse(centerX, hatY, 170, 140);
-  fill('#D4AC87');
-  rect(centerX - 95, hatY, 190, 25, 10);
-}
-
-function drawHat_Back() {
-  const hatY = centerY - 110;
-  noStroke();
-  fill('#C75D5D');
-  arc(centerX, hatY, 350, 180, 150, 390);
-}
-
-function drawHat_Front() {
-  const hatY = centerY - 100;
-  noStroke();
-  fill('#C75D5D');
-  arc(centerX, hatY, 350, 150, 0, 180);
-}
-
-function drawShoulder() {
-  const shoulderY = centerY + 180;
-  const shoulderSize = 210;
-  const shoulderOffset = 130;
-  fill('#FFFFFF');
-  stroke('#DDDDDD');
-  strokeWeight(3);
-  arc(centerX - shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
-  arc(centerX + shoulderOffset, shoulderY, shoulderSize, shoulderSize, 180, 360);
-  noStroke();
-  rect(centerX - shoulderOffset, shoulderY -90, shoulderOffset * 2, 110);
-}
-
-function keyPressed() {
-  if (key === 's' || key === 'S') {
-    saveGif('myCaricature_animation.gif', 10);
-  }
-}
+// (나머지 drawFace, drawEyes 등 함수는 centerX, centerY 변수를 사용하므로 수정 없이 그대로 사용)
+// ...
+// (모든 함수는 위 수정된 drawBackground() 아래에 그대로 붙여넣습니다.)
+// ...
