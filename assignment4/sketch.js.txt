@@ -3,7 +3,7 @@ let colorNight;
 let stars = []; // Array for stars
 
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(350, 350);
 
   // Set frame rate for GIF size
   frameRate(24);

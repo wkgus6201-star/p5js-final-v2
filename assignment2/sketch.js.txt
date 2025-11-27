@@ -20,7 +20,7 @@ const centerX = 300;
 const centerY = 220;
 
 function setup() {
-  createCanvas(600, 400);
+  createCanvas(350, 350);
   angleMode(DEGREES);
   noLoop();
 }
